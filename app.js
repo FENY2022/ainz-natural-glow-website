@@ -228,7 +228,7 @@
         <div class="checkout-total"><span>Order subtotal</span><strong>${money(getCartTotal())}</strong></div>
         <div class="checkout-actions">
           <button class="button button-primary" type="submit">Open SMS order</button>
-          <button class="button button-ghost" type="button" data-messenger-order>Copy order & open Messenger</button>
+          <button class="button button-ghost" type="button" data-messenger-order>Copy order then open Messenger</button>
           <button class="button button-ghost" type="button" data-copy-order>Copy order details</button>
         </div>
         <p class="checkout-help">If Messenger opens without details, tap the message box and paste your copied order. Delivery fee, payment method, and final confirmation will be arranged directly with AINZ.</p>
@@ -253,12 +253,8 @@
     $('[data-messenger-order]').addEventListener('click', async () => {
       if (!form.reportValidity()) return;
       const message = buildOrderMessage(getCustomer());
-      const messengerWindow = window.open('about:blank', '_blank');
-      if (messengerWindow) messengerWindow.opener = null;
       await copyText(message);
-      const messengerLink = `${MESSENGER_URL}?text=${encodeURIComponent(message)}`;
-      if (messengerWindow) messengerWindow.location.href = messengerLink;
-      else window.location.href = messengerLink;
+      window.location.href = MESSENGER_URL;
       showToast('Order copied. Paste it in Messenger chat box');
     });
 
