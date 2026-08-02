@@ -197,6 +197,21 @@
     ].join('\n');
   }
 
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
+    }
+  }
+
   function showCheckout() {
     if (!getCartCount()) return;
     openModal(`
@@ -235,30 +250,23 @@
       showToast('Your SMS order is ready to send');
     });
 
-    $('[data-messenger-order]').addEventListener('click', () => {
+    $('[data-messenger-order]').addEventListener('click', async () => {
       if (!form.reportValidity()) return;
       const message = buildOrderMessage(getCustomer());
-      window.open(`${MESSENGER_URL}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-      showToast('Your Messenger order is ready to send');
+      const messengerWindow = window.open('about:blank', '_blank');
+      if (messengerWindow) messengerWindow.opener = null;
+      await copyText(message);
+      const messengerLink = `${MESSENGER_URL}?text=${encodeURIComponent(message)}`;
+      if (messengerWindow) messengerWindow.location.href = messengerLink;
+      else window.location.href = messengerLink;
+      showToast('Order copied. Paste it in Messenger if needed');
     });
 
     $('[data-copy-order]').addEventListener('click', async () => {
       if (!form.reportValidity()) return;
       const message = buildOrderMessage(getCustomer());
-      try {
-        await navigator.clipboard.writeText(message);
-        showToast('Order details copied');
-      } catch {
-        const textarea = document.createElement('textarea');
-        textarea.value = message;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        textarea.remove();
-        showToast('Order details copied');
-      }
+      await copyText(message);
+      showToast('Order details copied');
     });
   }
 
