@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: ainz-natural-glow-soap
+    runtime: static
+    buildCommand: echo "Static website ready"
+    staticPublishPath: .
