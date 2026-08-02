@@ -3,6 +3,7 @@
 
   const PHONE_DISPLAY = '0995 923 7839';
   const PHONE_INTL = '+639959237839';
+  const MESSENGER_URL = 'https://m.me/aineze';
   const PRICE = 159;
 
   const products = {
@@ -201,8 +202,8 @@
     openModal(`
       <form class="checkout-form" data-checkout-form>
         <span class="eyebrow"><span></span> Complete your order</span>
-        <h2 id="modal-title">Send order by SMS</h2>
-        <p>Enter your details below. The website will prepare an order message for ${PHONE_DISPLAY}. No online payment will be charged here.</p>
+        <h2 id="modal-title">Send your order</h2>
+        <p>Enter your details below. The website will prepare an order message for SMS or Messenger. No online payment will be charged here.</p>
         <div class="form-grid">
           <div class="field"><label for="customer-name">Full name</label><input id="customer-name" name="name" autocomplete="name" required /></div>
           <div class="field"><label for="customer-contact">Contact number</label><input id="customer-contact" name="contact" inputmode="tel" autocomplete="tel" required /></div>
@@ -212,6 +213,7 @@
         <div class="checkout-total"><span>Order subtotal</span><strong>${money(getCartTotal())}</strong></div>
         <div class="checkout-actions">
           <button class="button button-primary" type="submit">Open SMS order</button>
+          <button class="button button-ghost" type="button" data-messenger-order>Open Messenger</button>
           <button class="button button-ghost" type="button" data-copy-order>Copy order details</button>
         </div>
         <p class="checkout-help">Delivery fee, payment method, and final confirmation will be arranged directly with AINZ.</p>
@@ -231,6 +233,13 @@
       const message = buildOrderMessage(getCustomer());
       window.location.href = `sms:${PHONE_INTL}?body=${encodeURIComponent(message)}`;
       showToast('Your SMS order is ready to send');
+    });
+
+    $('[data-messenger-order]').addEventListener('click', () => {
+      if (!form.reportValidity()) return;
+      const message = buildOrderMessage(getCustomer());
+      window.open(`${MESSENGER_URL}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+      showToast('Your Messenger order is ready to send');
     });
 
     $('[data-copy-order]').addEventListener('click', async () => {
